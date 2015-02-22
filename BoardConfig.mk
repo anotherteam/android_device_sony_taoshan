@@ -143,6 +143,16 @@ BOARD_USES_QC_TIME_SERVICES := true
 # Power HAL
 TARGET_POWERHAL_NO_TOUCH_BOOST := true
 
+# Enable dex-preoptimization to speed up first boot sequence
+ifeq ($(HOST_OS),linux)
+  ifeq ($(TARGET_BUILD_VARIANT),userdebug)
+    ifeq ($(WITH_DEXPREOPT),)
+      WITH_DEXPREOPT := true
+    endif
+  endif
+endif
+DONT_DEXPREOPT_PREBUILTS := true
+
 # CMHW
 BOARD_HARDWARE_CLASS := device/sony/taoshan/cmhw
 
