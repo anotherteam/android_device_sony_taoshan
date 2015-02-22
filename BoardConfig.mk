@@ -13,61 +13,60 @@
 # limitations under the License.
 
 # Product-specific compile-time definitions.
-
 include vendor/sony/taoshan/BoardConfigVendor.mk
 
-# inherit qcom common sepolicies
+# Inherit qcom common sepolicies
 include device/qcom/sepolicy/sepolicy.mk
 
-# inherit from Sony common
+# Inherit from Sony common
 include device/sony/common/BoardConfigCommon.mk
 
-# inherit from msm8960-common
+# Inherit from msm8960-common
 include device/sony/msm8960-common/BoardConfigCommon.mk
 
-USE_CAMERA_STUB := false
-
+# Platform
 TARGET_BOARD_PLATFORM := msm8960
 TARGET_CPU_VARIANT := krait
 BOARD_VENDOR_PLATFORM := taoshan
 TARGET_BOOTLOADER_BOARD_NAME := qcom
+TARGET_SPECIFIC_HEADER_PATH += device/sony/taoshan/include
+BOARD_USES_QCOM_HARDWARE := true
+TARGET_USES_QCOM_BSP := true
 
-TARGET_OTA_ASSERT_DEVICE := C2105,C2104,c2105,c2104,taoshan
-
+# Cflags
 TARGET_GLOBAL_CFLAGS += -mfpu=neon-vfpv4 -mfloat-abi=softfp
 TARGET_GLOBAL_CPPFLAGS += -mfpu=neon-vfpv4 -mfloat-abi=softfp
 COMMON_GLOBAL_CFLAGS += -D__ARM_USE_PLD -D__ARM_CACHE_LINE_SIZE=64
 
+# Kernel
 BOARD_KERNEL_BASE := 0x80200000
 BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x02000000
-# the androidboot.hardware has impact on loading .rc files
 BOARD_KERNEL_CMDLINE := console=ttyHSL0,115200,n8 androidboot.hardware=qcom androidboot.selinux=permissive androidboot.bootdevice=msm_sdcc.1 user_debug=31 msm_rtb.filter=0x3F ehci-hcd.park=3 maxcpus=2
 BOARD_KERNEL_PAGESIZE := 2048
-BOARD_FLASH_BLOCK_SIZE := 131072 # (BOARD_KERNEL_PAGESIZE * 64)
+BOARD_FLASH_BLOCK_SIZE := 131072
+TARGET_KERNEL_SOURCE := kernel/sony/msm8930
+TARGET_KERNEL_CONFIG := cyanogenmod_taoshan_defconfig
 
-TARGET_USERIMAGES_USE_EXT4 := true
-BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE := ext4
-
+# Partitions
 BOARD_BOOTIMAGE_PARTITION_SIZE := 0x108BB9E
 BOARD_SYSTEMIMAGE_PARTITION_SIZE := 1258291200
 BOARD_USERDATAIMAGE_PARTITION_SIZE := 1711276032
 BOARD_CACHEIMAGE_PARTITION_SIZE := 268435456
+TARGET_USERIMAGES_USE_EXT4 := true
+BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE := ext4
 
+# OpenGL
 BOARD_EGL_CFG := device/sony/taoshan/rootdir/system/lib/egl/egl.cfg
 
+# Vold
 BOARD_VOLD_MAX_PARTITIONS := 33
 BOARD_VOLD_DISC_HAS_MULTIPLE_MAJORS := true
 BOARD_VOLD_EMMC_SHARES_DEV_MAJOR := true
 TARGET_USE_CUSTOM_LUN_FILE_PATH := /sys/devices/platform/msm_hsusb/gadget/lun%d/file
 
-TARGET_KERNEL_SOURCE := kernel/sony/msm8930
-TARGET_KERNEL_CONFIG := cyanogenmod_taoshan_defconfig
-
-BOARD_USES_QCOM_HARDWARE := true
-TARGET_USES_QCOM_BSP := true
-
-# Bionic
+# Optimizations used by Qualcomm
 TARGET_USE_QCOM_BIONIC_OPTIMIZATION := true
+TARGET_ENABLE_QC_AV_ENHANCEMENTS := true
 
 # Enable Minikin text layout engine (will be the default soon)
 USE_MINIKIN := true
@@ -84,13 +83,15 @@ MALLOC_IMPL := dlmalloc
 # GPS
 BOARD_HAVE_NEW_QC_GPS := true
 
-# Disable block based OTA
+# OTA
 TARGET_USES_BLOCK_BASED_OTA := false
+TARGET_OTA_ASSERT_DEVICE := C2105,C2104,c2105,c2104,taoshan
 
-TARGET_SPECIFIC_HEADER_PATH += device/sony/taoshan/include
-
+# RIL
 BOARD_RIL_NO_CELLINFOLIST := true
+BOARD_RIL_NO_SEEK := true
 
+# Audio
 BOARD_USES_ALSA_AUDIO := true
 BOARD_USES_LEGACY_ALSA_AUDIO := true
 TARGET_USES_QCOM_COMPRESSED_AUDIO := true
@@ -101,11 +102,11 @@ QCOM_ACDB_ENABLED := true
 QCOM_FM_ENABLED := true
 AUDIO_FEATURE_ENABLED_FM := true
 
-TARGET_ENABLE_QC_AV_ENHANCEMENTS := true
-
+# Camera
 USE_DEVICE_SPECIFIC_CAMERA := true
 COMMON_GLOBAL_CFLAGS += -DNEEDS_VECTORIMPL_SYMBOLS
 COMMON_GLOBAL_CFLAGS += -DSONY_CAM_PARAMS
+USE_CAMERA_STUB := false
 
 # Vendor Init
 TARGET_UNIFIED_DEVICE := true
@@ -125,11 +126,10 @@ WIFI_DRIVER_MODULE_NAME          := "wlan"
 WIFI_DRIVER_FW_PATH_STA          := "sta"
 WIFI_DRIVER_FW_PATH_AP           := "ap"
 
+# Bluetooth
 BOARD_HAVE_BLUETOOTH_QCOM := true
 BLUETOOTH_HCI_USE_MCT := true
 BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := device/sony/taoshan/bluetooth
-
-BOARD_RIL_NO_SEEK := true
 
 # Recovery
 TARGET_RECOVERY_FSTAB = device/sony/taoshan/rootdir/root/fstab.qcom
@@ -137,10 +137,13 @@ BOARD_HAS_NO_SELECT_BUTTON := true
 TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
 BOARD_CUSTOM_BOOTIMG_MK := device/sony/taoshan/custombootimg.mk
 
+# Time
 BOARD_USES_QC_TIME_SERVICES := true
 
+# Power HAL
 TARGET_POWERHAL_NO_TOUCH_BOOST := true
 
+# CMHW
 BOARD_HARDWARE_CLASS := device/sony/taoshan/cmhw
 
 # TWRP configs
@@ -163,8 +166,10 @@ TW_BRIGHTNESS_PATH := /sys/class/leds/lcd-backlight/brightness
 TW_MAX_BRIGHTNESS := 255
 TW_NO_USB_STORAGE := true
 
+# LOGD
 TARGET_USES_LOGD := false
 
+# SELinux
 BOARD_SEPOLICY_DIRS += \
     device/sony/taoshan/sepolicy
 
